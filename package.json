@@ -2,11 +2,11 @@
 	"name": "api",
 	"version": "1.0.0",
 	"description": "",
-	"main": "./src/server.js",
+	"main": "./server.js",
 	"type": "module",
 	"scripts": {
 		"build": "tsup src --outDir build --format esm",
-		"start": "node ./dist/src/server.js",
+		"start": "node ./build/server.js",
 		"test": "dotenv -e .env.test prisma migrate reset && dotenv -e .env.test cross-env jest --runInBandjest --detectOpenHandles -i",
 		"dev": "tsx watch src/server.ts"
 	},
