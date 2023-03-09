@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model accounts {
+  id                                     Int       @id(map: "accounts_pk") @default(autoincrement())
+  username                               String    @unique
+  email                                  String    @unique
+  password                               String
+  last_status                            String
+  rating                                 String
+  games_accountsTogames_first_player_id  games[]   @relation("accountsTogames_first_player_id")
+  games_accountsTogames_second_player_id games[]   @relation("accountsTogames_second_player_id")
+  invites_accountsToinvites_to           invites[] @relation("accountsToinvites_to")
+  invites_accountsToinvites_from         invites[] @relation("accountsToinvites_from")
+}
+
+model game_history {
+  id                Int    @id(map: "game_history_pk") @default(autoincrement())
+  starting_position String
+  final_position    String
+  piece             String
+  color             String
+  game_token        String
+  last_status       String
+  games             games  @relation(fields: [game_token], references: [token], onDelete: NoAction, onUpdate: NoAction, map: "game_history_fk0")
+}
+
+model games {
+  id                                        Int            @id(map: "games_pk") @default(autoincrement())
+  first_player_id                           Int
+  second_player_id                          Int
+  token                                     String         @unique
+  time_to_play                              Int
+  white_player                              Int
+  game_history                              game_history[]
+  accounts_accountsTogames_first_player_id  accounts       @relation("accountsTogames_first_player_id", fields: [first_player_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "games_fk0")
+  accounts_accountsTogames_second_player_id accounts       @relation("accountsTogames_second_player_id", fields: [second_player_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "games_fk1")
+  table                                     table[]
+}
+
+model table {
+  id              Int    @id(map: "table_pk") @default(autoincrement())
+  position        String
+  contains        String
+  line            Int
+  column          String
+  index_of_column Int
+  index           Int
+  color           String
+  game_token      String
+  games           games  @relation(fields: [game_token], references: [token], onDelete: NoAction, onUpdate: NoAction, map: "table_fk0")
+}
+
+model invites {
+  id                              Int      @id(map: "invites_pk") @default(autoincrement())
+  to                              Int
+  from                            Int
+  status_invite                   String
+  last_status                     String
+  token                           String
+  accounts_accountsToinvites_to   accounts @relation("accountsToinvites_to", fields: [to], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "invites_fk0")
+  accounts_accountsToinvites_from accounts @relation("accountsToinvites_from", fields: [from], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "invites_fk1")
+}
